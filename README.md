@@ -11,7 +11,7 @@ Sets the bones of the selected skeleton to the angles defined in the Template.
 - Set Bones of the selected skeleton to the angles defined in any template.
 - Set the rotation angle of the bone in the template.
 - Bones prefix can be specify by regular expression.
-- Bone angles can be set locally or globally in x, y, z angles.
+- Bone angles can be set local or global in x, y, z angles.
 
 ### Usage
 
