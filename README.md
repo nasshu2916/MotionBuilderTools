@@ -1,4 +1,4 @@
-# MotionBuilderTool
+# MotionBuilderTools
 
 ## SetBoneAngle
 
