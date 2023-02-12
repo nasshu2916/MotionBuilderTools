@@ -1,0 +1,57 @@
+<config_root>
+    <match_list>
+        <item key="Hips" />
+        <item key="LeftUpLeg" />
+        <item key="LeftLeg" />
+        <item key="LeftFoot" />
+        <item key="RightUpLeg" />
+        <item key="RightLeg" />
+        <item key="RightFoot" />
+        <item key="Spine" />
+        <item key="LeftArm" x="-180" y="0" z="90" />
+        <item key="LeftForeArm" x="0" y="0" z="0" local="true" />
+        <item key="LeftHand" x="0" y="0" z="0" local="true" />
+        <item key="RightArm" x="180" y="0" z="-90" />
+        <item key="RightForeArm" x="0" y="0" z="0" local="true" />
+        <item key="RightHand" x="0" y="0" z="0" local="true" />
+        <item key="Head" />
+        <item key="LeftToeBase" />
+        <item key="RightToeBase" />
+        <item key="LeftShoulder" x="-180" y="0" z="90" />
+        <item key="RightShoulder" x="180" y="0" z="-90"/>
+        <item key="Neck" />
+        <item key="Spine1" />
+        <item key="Spine2" />
+        <item key="Spine3" />
+        <item key="LeftHandThumb1" />
+        <item key="LeftHandThumb2" />
+        <item key="LeftHandThumb3" />
+        <item key="LeftHandIndex1" x="-180" y="0" z="90" />
+        <item key="LeftHandIndex2" x="0" y="0" z="0" local="true" />
+        <item key="LeftHandIndex3" x="0" y="0" z="0" local="true" />
+        <item key="LeftHandMiddle1" x="-180" y="0" z="90" />
+        <item key="LeftHandMiddle2" x="0" y="0" z="0" local="true" />
+        <item key="LeftHandMiddle3" x="0" y="0" z="0" local="true" />
+        <item key="LeftHandRing1" x="-180" y="0" z="90" />
+        <item key="LeftHandRing2" x="0" y="0" z="0" local="true" />
+        <item key="LeftHandRing3" x="0" y="0" z="0" local="true" />
+        <item key="LeftHandPinky1" x="-180" y="0" z="90" />
+        <item key="LeftHandPinky2" x="0" y="0" z="0" local="true" />
+        <item key="LeftHandPinky3" x="0" y="0" z="0" local="true" />
+        <item key="RightHandThumb1" />
+        <item key="RightHandThumb2" />
+        <item key="RightHandThumb3" />
+        <item key="RightHandIndex1" x="-180" y="0" z="-90" />
+        <item key="RightHandIndex2" x="0" y="0" z="0" local="true" />
+        <item key="RightHandIndex3" x="0" y="0" z="0" local="true" />
+        <item key="RightHandMiddle1" x="-180" y="0" z="-90" />
+        <item key="RightHandMiddle2" x="0" y="0" z="0" local="true" />
+        <item key="RightHandMiddle3" x="0" y="0" z="0" local="true" />
+        <item key="RightHandRing1" x="-180" y="0" z="-90" />
+        <item key="RightHandRing2" x="0" y="0" z="0" local="true" />
+        <item key="RightHandRing3" x="0" y="0" z="0" local="true" />
+        <item key="RightHandPinky1" x="-180" y="0" z="-90" />
+        <item key="RightHandPinky2" x="0" y="0" z="0" local="true" />
+        <item key="RightHandPinky3" x="0" y="0" z="0" local="true" />
+    </match_list>
+</config_root>
