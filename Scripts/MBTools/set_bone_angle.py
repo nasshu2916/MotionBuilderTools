@@ -15,7 +15,7 @@ template_paths = []
 config = FBConfigFile(
     str(os.path.join(os.path.dirname(__file__), "MBTools_config.txt"))
 )
-prefix_regex = config.Get("SetBoneAngle", "prefix_regex") or r"^(.*_)\[\\w-\]+$"
+prefix_regex = config.Get("SetBoneAngle", "prefix_regex") or r"^(.*_)[\w-]+$"
 
 
 def execute(root_bone, bone_rotation_map, prefix=""):
