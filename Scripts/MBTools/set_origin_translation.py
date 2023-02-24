@@ -12,6 +12,24 @@ from pyfbsdk import *
 from pyfbsdk_additions import *
 
 
+def set_translation_to_origin(model):
+    reference = model.Parent
+
+    if reference is None or reference.ClassName() != "FBModelNull":
+        FBMessageBox(
+            "Error",
+            "Require FBModelNull for root bone parent(Root bone: %s)" % model.LongName,
+            "OK",
+        )
+        return
+    translation = FBVector3d()
+    model.GetVector(translation, FBModelTransformationType.kModelTranslation, False)
+    translation[1] = 0
+    reference.SetVector(
+        translation * -1, FBModelTransformationType.kModelTranslation, True
+    )
+
+
 def set_origin_transform():
     models = FBModelList()
     FBGetSelectedModels(models)
@@ -19,26 +37,8 @@ def set_origin_transform():
         skeleton.get_root_skeleton(s)
         for s in filter(lambda m: skeleton.is_skeleton(m), models)
     ]
-    if len(root_skeletons) != 1:
-        FBMessageBox("Error", "Please select a model", "OK")
-        return
-
-    model = root_skeletons[0]
-    reference = model.Parent
-    if reference is None or reference.ClassName() != "FBModelNull":
-        FBMessageBox("Error", "Require FBModelNull for root bone parent", "OK")
-        return
-
-    root_bone_translation = FBVector3d()
-    model.GetVector(
-        root_bone_translation, FBModelTransformationType.kModelTranslation, False
-    )
-    root_bone_translation[1] = 0
-
-    print("set origin translation")
-    reference.SetVector(
-        root_bone_translation * -1, FBModelTransformationType.kModelTranslation, True
-    )
+    for root_skeleton in root_skeletons:
+        set_translation_to_origin(root_skeleton)
 
 
 if __name__ in ("__main__", "__builtin__"):
