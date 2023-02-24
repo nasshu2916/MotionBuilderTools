@@ -4,7 +4,11 @@
 import glob
 import os
 import re
+import sys
 import xml.etree.ElementTree as ET
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "."))
+import lib.skeleton as skeleton
 
 from pyfbsdk import *
 from pyfbsdk_additions import *
@@ -75,17 +79,6 @@ def get_bone_rotation_map(path):
     return bone_rotation_map
 
 
-def is_skeleton(model):
-    return type(model) == FBModelSkeleton
-
-
-def get_root_skeleton(skeleton):
-    if is_skeleton(skeleton.Parent):
-        return get_root_skeleton(skeleton.Parent)
-    else:
-        return skeleton
-
-
 def get_bone_prefix(skeleton):
     result = re.match(prefix_regex, skeleton.Name)
     return result.group(1) if result else ""
@@ -95,7 +88,7 @@ def set_bone_angle(template_path):
     models = FBModelList()
     FBGetSelectedModels(models)
     root_skeletons = [
-        get_root_skeleton(s) for s in filter(lambda m: is_skeleton(m), models)
+        skeleton.get_root_skeleton(s) for s in filter(lambda m: skeleton.is_skeleton(m), models)
     ]
 
     if len(set([id(s) for s in root_skeletons])) == 1:
