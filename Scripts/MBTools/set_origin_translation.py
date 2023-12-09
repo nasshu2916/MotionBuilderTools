@@ -41,5 +41,4 @@ def set_origin_transform():
         set_translation_to_origin(root_skeleton)
 
 
-if __name__ in ("__main__", "__builtin__"):
-    set_origin_transform()
+set_origin_transform()

@@ -171,6 +171,4 @@ def create_tool():
     populate_layout(t)
     ShowTool(t)
 
-
-if __name__ in ("__main__", "__builtin__"):
-    create_tool()
+create_tool()
