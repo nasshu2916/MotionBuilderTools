@@ -3,9 +3,11 @@
 
 import glob
 import os
-import re
 import sys
-import xml.etree.ElementTree as ET
+import yaml
+
+from pydantic import BaseModel
+from typing import List
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "."))
 import lib.skeleton as skeleton
@@ -13,44 +15,57 @@ import lib.skeleton as skeleton
 from pyfbsdk import *
 from pyfbsdk_additions import *
 
-CONFIG_DIR = os.path.join(os.path.dirname(__file__), "Config")
+CONFIG_DIR = os.path.join(os.path.dirname(__file__), "Config", "BoneAngle")
 template_types = FBList()
 template_paths = []
-config = FBConfigFile(
-    str(os.path.join(os.path.dirname(__file__), "MBTools_config.txt"))
-)
-prefix_regex = config.Get("SetBoneAngle", "prefix_regex") or r"^(.*_)[\w-]+$"
+for file_path in glob.glob(os.path.join(CONFIG_DIR, "*.yml")):
+    template_paths.append(file_path)
 
 
-def execute(root_bone, bone_rotation_map, prefix=""):
-    skeletons = [root_bone]
-    skeletons.extend(get_children(root_bone))
+def load_yaml(file_path):
+    with open(file_path, 'r') as file:
+        yaml_data = yaml.safe_load(file)
+    return yaml_data
+
+
+def execute(root_bone, target_config, prefix=""):
+    bones = [root_bone]
+    bones.extend(get_children(root_bone))
     FBSystem().Scene.Evaluate()
 
-    for skeleton in skeletons:
-        bone_name = skeleton.Name.lstrip(prefix)
-        if bone_name in bone_rotation_map:
-            bone_rotation = bone_rotation_map[bone_name]
-            current_rotation = FBVector3d()
-            skeleton.GetVector(
-                current_rotation, FBModelTransformationType.kModelRotation
-            )
+    items = target_config["items"]
+    for prefix in ["", "Left", "Right"]:
+        is_reverse = False
+        if prefix != "":
+            is_reverse = target_config.get("reverse_{}".format(prefix.lower()), False)
 
+        __do_execute(bones, items, is_reverse, prefix, "")
+        FBSystem().Scene.Evaluate()
+
+def __do_execute(bones, items, is_reverse, prefix = "", suffix = ""):
+    for item in items:
+        search_name = prefix + item["key"].strip(prefix).strip(suffix) + suffix
+        bone = None
+
+        for bone in bones:
+            bone_name = bone.Name
+            if bone.Name.endswith(search_name):
+                bone = bone
+                break
+        if bone:
+            value = item["value"]
             rotation = FBVector3d(
-                bone_rotation.get("x", current_rotation[0]),
-                bone_rotation.get("y", current_rotation[1]),
-                bone_rotation.get("z", current_rotation[2]),
+                value["x"] if value.get("x") is not None else bone.Rotation[0],
+                value["y"] if value.get("y") is not None else bone.Rotation[1],
+                value["z"] if value.get("z") is not None else bone.Rotation[2]
             )
-            is_local = bone_rotation.get("local") or False
 
-            skeleton.SetVector(
-                rotation,
-                FBModelTransformationType.kModelRotation,
-                not is_local,
-            )
-            FBSystem().Scene.Evaluate()
+            # is_reverse が True の場合は z 軸の回転を反転させる
+            if is_reverse: rotation[2] *= -1
 
+            bone.SetVector(rotation, FBModelTransformationType.kModelRotation, True)
 
+# 再帰的に node の children を取得する
 def get_children(root):
     children = []
     for child in root.Children:
@@ -59,61 +74,25 @@ def get_children(root):
     return children
 
 
-def get_bone_rotation_map(path):
-    bone_rotation_map = {}
-    parsed_xml_file = ET.parse(path)
-    for item in parsed_xml_file.iter("item"):
-        bone_name = item.attrib.get("key")
-
-        rotation = {}
-        for key in ["x", "y", "z"]:
-            value = item.attrib.get(key)
-            if value:
-                rotation[key] = float(value)
-
-        if any(rotation):
-            if item.attrib.get("local"):
-                rotation["local"] = True
-            bone_rotation_map[bone_name] = rotation
-
-    return bone_rotation_map
-
-
-def get_bone_prefix(skeleton):
-    result = re.match(prefix_regex, skeleton.Name)
-    return result.group(1) if result else ""
-
-
 def set_bone_angle(template_path):
     models = FBModelList()
     FBGetSelectedModels(models)
-    root_skeletons = [
-        skeleton.get_root_skeleton(s) for s in filter(lambda m: skeleton.is_skeleton(m), models)
-    ]
+    root_bones = []
+    for m in models:
+        root_bone = skeleton.get_root_skeleton(m)
+        if root_bone: root_bones.append(root_bone)
 
-    if len(set([id(s) for s in root_skeletons])) == 1:
-        root_bone = root_skeletons[0]
-        bone_rotation_map = get_bone_rotation_map(template_path)
-        bone_prefix = get_bone_prefix(root_bone)
-        execute(root_bone, bone_rotation_map, bone_prefix)
+    if len(set([id(s) for s in root_bones])) == 1:
+        root_bone = root_bones[0]
+        yaml_data = load_yaml(template_path)
+        execute(root_bone, yaml_data["target"], "")
 
     else:
         FBMessageBox("Warning", "Please Select Actor's bone.", "OK")
 
 
-def prefix_regex_on_change(control, _event):
-    global prefix_regex
-    prefix = control.Text
-    prefix_regex = r"{}".format(prefix)
-
-
 def btn_callback(_control, _event):
     template_path = template_paths[template_types.ItemIndex]
-    config.Set(
-        "SetBoneAngle",
-        "last_execute_template_name",
-        template_types.Items[template_types.ItemIndex],
-    )
     set_bone_angle(template_path)
 
 
@@ -125,6 +104,7 @@ def populate_layout(main_layout):
     h = FBAddRegionParam(-10, FBAttachType.kFBAttachBottom, "")
     main_layout.AddRegion(main_layout_name, main_layout_name, x, y, w, h)
 
+    # template 選択の layout
     layout = FBVBoxLayout(FBAttachType.kFBAttachTop)
     grid = FBGridLayout()
     label = FBLabel()
@@ -133,26 +113,14 @@ def populate_layout(main_layout):
     template_types.Style = FBListStyle.kFBDropDownList
     template_types.MultiSelect = False
 
-    last_execute_template_name = config.Get(
-        "SetBoneAngle", "last_execute_template_name"
-    )
-    for file_path in glob.glob(os.path.join(CONFIG_DIR, "*.xml")):
+    for file_path in template_paths:
         template_name = os.path.splitext(os.path.basename(file_path))[0]
-        template_paths.append(file_path)
         template_types.Items.append(str(template_name))
-        if template_name == last_execute_template_name:
-            template_types.ItemIndex = len(template_paths) - 1
     grid.AddRange(template_types, 0, 0, 1, 2)
 
-    label = FBLabel()
-    label.Caption = "Prefix Regex:"
-    grid.Add(label, 1, 0)
-    bone_prefix = FBEdit()
-    bone_prefix.Text = prefix_regex
-    bone_prefix.OnChange.Add(prefix_regex_on_change)
-    grid.AddRange(bone_prefix, 1, 1, 1, 2)
-    layout.Add(grid, 60)
+    layout.Add(grid, 30)
 
+    # Execute ボタンの layout
     button = FBButton()
     button.Caption = "Execute"
     button.Hint = ""
@@ -167,8 +135,9 @@ def populate_layout(main_layout):
 def create_tool():
     t = FBCreateUniqueTool("Set Bone angle from template")
     t.StartSizeX = 350
-    t.StartSizeY = 180
+    t.StartSizeY = 150
     populate_layout(t)
     ShowTool(t)
+
 
 create_tool()
