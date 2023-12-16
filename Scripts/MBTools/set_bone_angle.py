@@ -7,9 +7,6 @@ import re
 import sys
 import yaml
 
-from pydantic import BaseModel
-from typing import List
-
 sys.path.append(os.path.join(os.path.dirname(__file__), "."))
 import lib.skeleton as skeleton
 
@@ -65,17 +62,17 @@ def __do_execute(bones, items, is_reverse=False, prefix="", suffix=""):
     for item in items:
         search_name = prefix + item["key"] + suffix
         search_name = normalize_string(search_name)
-        # 実行対象の bone を取得する
-        bone = __search_bone(bones, search_name)
 
-        if bone:
+        for bone in __search_bones(bones, search_name):
             value = item["value"]
+            bone_rotation = FBVector3d()
+            bone.GetVector(bone_rotation, FBModelTransformationType.kModelRotation, True)
             # value に x, y, z が指定されている場合はその値を設定する
             # null や指定されていない場合は現在の値を設定する
             rotation = FBVector3d(
-                value["x"] if value.get("x") is not None else bone.Rotation[0],
-                value["y"] if value.get("y") is not None else bone.Rotation[1],
-                value["z"] if value.get("z") is not None else bone.Rotation[2]
+                value["x"] if value.get("x") is not None else bone_rotation[0],
+                value["y"] if value.get("y") is not None else bone_rotation[1],
+                value["z"] if value.get("z") is not None else bone_rotation[2]
             )
 
             # is_reverse が True の場合は z 軸の回転を反転させる
@@ -83,12 +80,15 @@ def __do_execute(bones, items, is_reverse=False, prefix="", suffix=""):
             bone.SetVector(rotation, FBModelTransformationType.kModelRotation, True)
 
 
-def __search_bone(bones, search_name):
+def __search_bones(bones, search_name):
     "search_name に一致する bone を取得する"
 
+    result = []
     for bone in bones:
         if normalize_string(bone.Name).endswith(search_name):
-            return bone
+            result.append(bone)
+
+    return result
 
 
 def get_children(root):
@@ -102,6 +102,7 @@ def get_children(root):
 
 
 def set_bone_angle(template_path):
+    print("set_bone_angle, template_path: {}".format(template_path))
     models = FBModelList()
     FBGetSelectedModels(models)
     root_bones = []
@@ -118,6 +119,23 @@ def set_bone_angle(template_path):
         FBMessageBox("Warning", "Please Select Actor's bone.", "OK")
 
 
+def on_choose_template(control, event):
+    dialog = FBFilePopup()
+    dialog.Style = FBFilePopupStyle.kFBFilePopupOpen
+    dialog.Filter = '*.yml'
+    dialog.Path = CONFIG_DIR
+
+    if dialog.Execute():
+        file_path = dialog.FullFilename
+        filename = os.path.basename(file_path)
+
+        template_types.Items.removeAll()
+        template_types.Items.append(filename)
+        template_types.ItemIndex = 0
+        template_paths.clear()
+        template_paths.append(file_path)
+
+
 def btn_callback(_control, _event):
     template_path = template_paths[template_types.ItemIndex]
     set_bone_angle(template_path)
@@ -131,23 +149,31 @@ def populate_layout(main_layout):
     h = FBAddRegionParam(-10, FBAttachType.kFBAttachBottom, "")
     main_layout.AddRegion(main_layout_name, main_layout_name, x, y, w, h)
 
-    # template 選択の layout
+    # template 選択
     layout = FBVBoxLayout(FBAttachType.kFBAttachTop)
     grid = FBGridLayout()
     label = FBLabel()
     label.Caption = "Template:"
-    grid.Add(label, 0, 0)
+    grid.AddRange(label, 0, 0, 0, 3)
     template_types.Style = FBListStyle.kFBDropDownList
     template_types.MultiSelect = False
 
     for file_path in template_paths:
         template_name = os.path.splitext(os.path.basename(file_path))[0]
         template_types.Items.append(str(template_name))
-    grid.AddRange(template_types, 0, 0, 1, 2)
+    grid.AddRange(template_types, 0, 0, 3, 9)
+
+    # テンプレート選択ボタン
+    button = FBButton()
+    button.Caption = ".."
+    button.Hint = "Choose template file"
+    button.Justify = FBTextJustify.kFBTextJustifyCenter
+    grid.Add(button, 0, 10)
+    button.OnClick.Add(on_choose_template)
 
     layout.Add(grid, 30)
 
-    # Execute ボタンの layout
+    # Execute ボタン
     button = FBButton()
     button.Caption = "Execute"
     button.Hint = ""

@@ -2,38 +2,38 @@ target:
   items:
     - key: Hips
       value: {x: null, y: 0, z: null}
-    # - key: Arm
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: ForeArm
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: Hand
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandThumb2
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandThumb3
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandIndex1
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandIndex2
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandIndex3
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandMiddle1
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandMiddle2
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandMiddle3
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandRing1
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandRing2
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandRing3
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandPinky1
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandPinky2
-    #   value: {x: 90, y: 0, z: 90}
-    # - key: HandPinky3
-    #   value: {x: 90, y: 0, z: 90}
+    - key: Arm
+      value: {x: 90, y: 0, z: 90}
+    - key: ForeArm
+      value: {x: 90, y: 0, z: 90}
+    - key: Hand
+      value: {x: 90, y: 0, z: 90}
+    - key: HandThumb2
+      value: {x: 90, y: 0, z: 90}
+    - key: HandThumb3
+      value: {x: 90, y: 0, z: 90}
+    - key: HandIndex1
+      value: {x: 90, y: 0, z: 90}
+    - key: HandIndex2
+      value: {x: 90, y: 0, z: 90}
+    - key: HandIndex3
+      value: {x: 90, y: 0, z: 90}
+    - key: HandMiddle1
+      value: {x: 90, y: 0, z: 90}
+    - key: HandMiddle2
+      value: {x: 90, y: 0, z: 90}
+    - key: HandMiddle3
+      value: {x: 90, y: 0, z: 90}
+    - key: HandRing1
+      value: {x: 90, y: 0, z: 90}
+    - key: HandRing2
+      value: {x: 90, y: 0, z: 90}
+    - key: HandRing3
+      value: {x: 90, y: 0, z: 90}
+    - key: HandPinky1
+      value: {x: 90, y: 0, z: 90}
+    - key: HandPinky2
+      value: {x: 90, y: 0, z: 90}
+    - key: HandPinky3
+      value: {x: 90, y: 0, z: 90}
   reverse_right: true
