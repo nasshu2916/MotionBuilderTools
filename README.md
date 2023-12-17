@@ -22,7 +22,7 @@ Sets the bones of the selected skeleton to the angles defined in the Template.
 
 The template file is a yaml file that defines the bone angles.
 
-```yml
+```yaml
 target:
   items: # rotation target bones (required)
       - key: "BoneName" # bone name (Left or Right is not required)
