@@ -34,7 +34,7 @@ def set_origin_transform():
     models = FBModelList()
     FBGetSelectedModels(models)
     root_skeletons = [
-        skeleton.get_root_skeleton(s)
+        skeleton.get_root_bone(s)
         for s in filter(lambda m: skeleton.is_skeleton(m), models)
     ]
     for root_skeleton in root_skeletons:

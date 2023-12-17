@@ -65,14 +65,14 @@ def __do_execute(bones, items, is_reverse=False, prefix="", suffix=""):
 
         for bone in __search_bones(bones, search_name):
             value = item["value"]
-            bone_rotation = FBVector3d()
-            bone.GetVector(bone_rotation, FBModelTransformationType.kModelRotation, True)
+            current_rotation = FBVector3d()
+            bone.GetVector(current_rotation, FBModelTransformationType.kModelRotation, True)
             # value に x, y, z が指定されている場合はその値を設定する
             # null や指定されていない場合は現在の値を設定する
             rotation = FBVector3d(
-                value["x"] if value.get("x") is not None else bone_rotation[0],
-                value["y"] if value.get("y") is not None else bone_rotation[1],
-                value["z"] if value.get("z") is not None else bone_rotation[2]
+                value["x"] if value.get("x") is not None else current_rotation[0],
+                value["y"] if value.get("y") is not None else current_rotation[1],
+                value["z"] if value.get("z") is not None else current_rotation[2]
             )
 
             # is_reverse が True の場合は z 軸の回転を反転させる
@@ -107,7 +107,7 @@ def set_bone_angle(template_path):
     FBGetSelectedModels(models)
     root_bones = []
     for m in models:
-        root_bone = skeleton.get_root_skeleton(m)
+        root_bone = skeleton.get_root_bone(m)
         if root_bone: root_bones.append(root_bone)
 
     if len(set([id(s) for s in root_bones])) == 1:
